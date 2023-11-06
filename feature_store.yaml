@@ -1,0 +1,17 @@
+project: feast_performance
+registry: data/registry.db
+provider: local
+
+online_store:
+  type: postgres
+  connection_string: jdbc:postgresql://my-postgresql.default.svc.cluster.local:5432/postgres
+  username: ${PG_USERNAME}
+  password: ${PG_PASSWORD}
+
+# Assuming you also want to use PostgreSQL for the offline store:
+offline_store:
+  type: postgres
+  connection_string: jdbc:postgresql://my-postgresql.default.svc.cluster.local:5432/postgres
+  username: ${PG_USERNAME}
+  password: ${PG_PASSWORD}
+

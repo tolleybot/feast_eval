@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feature Store Comparison Matrix</title>
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  table, th, td {
+    border: 1px solid black;
+  }
+  th, td {
+    padding: 10px;
+    text-align: left;
+  }
+  th {
+    background-color: #f2f2f2;
+ }
+ tr.feature-category:nth-child(odd) {
+    background-color: #f9f9f9; /* Light shade for odd feature categories */
+  }
+  tr.feature-category:nth-child(even) {
+    background-color: #e9e9e9; /* Different light shade for even feature categories */
+  }
+  tr.difference {
+    background-color: #9bd5e9; /* Different light shade for even feature categories */
+  }
+</style>
+</head>
+<h2>Feature Store Comparison Summary</h2>
+<p>
+  When considering the best tool for managing data features within an on-site system, Feast stands out for several key reasons:
+</p>
+<ul>
+  <li><strong>Clear Support for Local Installation:</strong> Feast has a clearly documented path for running on on-site servers, giving maintainers full control without needing to rely heavily on external cloud services.</li>
+  <li><strong>Flexibility:</strong> Feast works well with various technologies and isn't tied tightly to just one cloud provider. This means it can be used in many different configurations, depending on the needs.</li>
+  <li><strong>Clear Instructions:</strong> Feast comes with good guides and documentation that make it easier for our team to use it effectively and to make modifications.</li>
+  <li><strong>Active Community:</strong> There's a lively group of users and developers around Feast who are constantly improving it and can offer help. This is a good sign that Feast will keep getting better and have lasting support.</li>
+</ul>
+<p>
+  These benefits make Feast a practical choice.
+</p>
+<h2>Feature Store Comparison Matrix: Feathr vs Feast</h2>
+<table>
+  <tr>
+    <th>Feature Category</th>
+    <th>Feature Detail</th>
+    <th>Feathr</th>
+    <th>Feast</th>
+  </tr>
+  <tr>
+    <td rowspan="3">Feature Definition</td>
+    <td>Syntax and expressiveness</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Batch and streaming support</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Composite and derived features</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td rowspan="3">Data Transformation and Enrichment</td>
+    <td>Preprocessing capabilities</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>On-the-fly transformations</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Window functions and temporal features</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr class="difference">
+    <td rowspan="3">Data Source Connectivity</td>
+    <td>Supported data sources</td>
+    <td>
+      <ul>        
+        <li>Azure Synapse + Azure SQL</li>
+        <li>Databricks</li>
+        <li>Custom connectors supported</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>File-based (Parquet files)</li>
+        <li>Snowflake</li>
+        <li>BigQuery</li>
+        <li>Redshift</li>
+        <li>Spark</li>
+        <li>PostgreSQL</li>
+        <li>Trino</li>
+        <li>Azure Synapse + Azure SQL</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>Ingestion and synchronization methods</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Connectors for data storage</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr class="difference">
+    <td rowspan="2">Storage Options</td>
+    <td>Data storage options</td>
+    <td>
+      <ul>
+        <li>Redis</li>
+        <li>Azure Blob Storage</li>
+        <li>Azure Cosmos DB</li>
+        <li>Azure SQL Database</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>Redis</li>
+        <li>Google BigQuery (Data warehouse)</li>
+        <li>Google Bigtable (NoSQL database)</li>
+        <li>Cassandra/Astra DB</li>
+        <li>MySQL</li>
+        <li>PostgreSQL</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>Read/write optimization</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td rowspan="3">Feature Serving</td>
+    <td>Serving layers</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Low-latency access</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Caching mechanisms, not natively</td>
+    <td>No</td>
+    <td>No</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Retrieval APIs</td>
+    <td>Client libraries and API design</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Language support</td>
+    <td>Yes via Python</td>
+    <td>Yes via Python</td>
+  </tr>
+  <tr>
+    <td rowspan="3">Feature Registry and Discovery</td>
+    <td>User interface for exploring features</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Metadata management for features</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Searchability and cataloging of features</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td rowspan="3">Feature Versioning</td>
+    <td>Version control for feature definitions</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Handling schema changes over time</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Deprecation and retirement of features</td>
+    <td>No</td>
+    <td>No</td>
+  </tr>
+  <tr>
+    <td rowspan="3">Security Features</td>
+    <td>Authentication and Identity Management</td>
+    <td>Yes (Depends on provider)</td>
+    <td>Yes (Depends on provider)</td>
+  </tr>
+  <tr>
+    <td>Authorization and Access Control</td>
+    <td>Yes (Depends on provider)</td>
+    <td>Yes (Depends on provider)</td>
+  </tr>
+  <tr>
+    <td>Encryption and Data Protection</td>
+    <td>Yes (Depends on provider)</td>
+    <td>Yes (Depends on provider)</td>
+  </tr>
+  <tr class="difference">
+    <td rowspan="3">Scalability and Performance</td>
+    <td>Handling of large datasets and high throughput</td>
+    <td>Yes, documentation points to leveraging Azure resources</td>
+    <td>Yes, through the use of Kubernetes</td>
+  </tr>
+  <tr class="difference">
+    <td>Auto-scaling and load balancing</td>
+    <td>Yes, via Azure cloud services</td>
+    <td>Yes, through the use of Kubernetes</td>
+  </tr>
+  <tr class="difference">
+    <td>Performance tuning and optimization options</td>
+    <td>Yes, via Azure cloud services</td>
+    <td>Yes, via Kubernetes</td>
+  </tr>
+  <tr>
+    <td rowspan="3">Monitoring and Observability</td>
+    <td>Monitoring of system health and performance</td>
+    <td>Dependent on deployment (e.g., Azure monitoring tools)</td>
+    <td>Dependent on deployment infrastructure</td>
+  </tr>
+  <tr>
+    <td>Data quality monitoring</td>
+    <td>Dependent on deployment</td>
+    <td>Dependent on deployment</td>
+  </tr>
+  <tr>
+    <td>Logging and traceability of feature usage</td>
+    <td>Dependent on deployment</td>
+    <td>Dependent on deployment</td>
+  </tr>
+  
+  <tr>
+    <td rowspan="3">Integration with ML Workflows</td>
+    <td>Compatibility with ML platforms</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Integration into CI/CD pipelines</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Support for model training and serving</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr class="difference">
+    <td rowspan="3">Deployment and Operations</td>
+    <td>Deployment options</td>
+    <td>
+      Yes, including:
+      <ul>
+        <li>Azure Cloud</li>     
+        <li>On-premises, possible as a docker contianer is provided.  However there is not a lot of documentation for a production system for on site installation</li>
+      </ul>
+    </td>
+    <td>
+      Yes, including:
+      <ul>
+        <li>Cloud. You could run this on any clould solution that supports Kubernetes</li>
+        <li>On-premises is possible but a scalable on site solution like Kubernetes is recommended</li>     
+        <li>Kubernetes, good support for this.  Which is a bonus for scalability</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>Infrastructure as code for setup and management</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Backup and disaster recovery options</td>
+    <td>No</td>
+    <td>No</td>
+  </tr>
+  <tr>
+    <td rowspan="3">Extensibility and Customization</td>
+    <td>Support for custom code and extensions</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Plugin architecture</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>User-defined functions (UDFs)</td>
+    <td>No</td>
+    <td>No</td>
+  </tr>
+  <tr>
+    <td rowspan="3">Community and Ecosystem</td>
+    <td>Open-source community activity and contributions</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Availability of additional tools and integrations</td>
+    <td>Yes</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Commercial support and enterprise features</td>
+    <td>No</td>
+    <td>No</td>
+  </tr>
+  <tr class="difference">
+    <td rowspan="3">Documentation</td>
+    <td>Quality and completeness of documentation</td>
+    <td>
+      Documentation is available but less comprehensive than Feast's. Mainly Azure-centric:
+      <ul>
+        <li>Python API wiki: <a href="https://feathr.readthedocs.io/en/latest/">Feathr Documentation</a></li>
+        <li>Main GitHub repository: <a href="https://github.com/feathr-ai/feathr">feathr-ai/feathr</a></li>
+        <li>Online transformation server: <a href="https://github.com/feathr-ai/feathr-online">feathr-ai/feathr-online</a></li>
+      </ul>
+      Activity on GitHub appears lower compared to Feast.
+    </td>
+    <td>
+      Extensive documentation and active community:
+      <ul>
+        <li>Documentation wiki: <a href="https://docs.feast.dev/getting-started/quickstart">Feast Documentation</a></li>
+        <li>Main GitHub repository: <a href="https://github.com/feast-dev/feast">feast-dev/feast</a></li>
+        <li>Training workshop: <a href="https://github.com/feast-dev/feast-workshop">feast-dev/feast-workshop</a></li>
+        <li>Example projects and CI examples available on GitHub</li>
+      </ul>
+      More frequent updates and pull requests indicate a more active community.
+    </td>
+  </tr>
+  <tr class="difference">
+    <td>Availability of training resources</td>
+    <td>Limited</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Community and commercial support channels</td>
+    <td>Available on Slack</td>
+    <td>Available on Slack</td>
+  </tr>
+</table>
+</body>
+</html>
