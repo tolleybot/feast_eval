@@ -8,12 +8,7 @@ from feast.types import Float32
 
 
 def setup_feature_store(
-    user: str,
-    password: str,
-    db_name: str = "performance",
     table_name: str = "feature_data",
-    host: str = "localhost",
-    port: str = "5432",
     num_features: int = 20000,
     ttl: timedelta = None,
     repo_path: str = ".",
@@ -22,12 +17,7 @@ def setup_feature_store(
     Sets up the feature store for the 'performance' project using Feast.
 
     Parameters:
-    - user: Database username
-    - password: Database password
-    - db_name: Database name
     - table_name: Table name where the data will be stored
-    - host: PostgreSQL host
-    - port: PostgreSQL port
     - num_features: Number of features to generate
     - ttl: Time to Live for the feature view
     - repo_path: Repository path for the feature store
@@ -48,8 +38,8 @@ def setup_feature_store(
     # Define data source
     feature_data_source = PostgreSQLSource(
         name="feature_data_source",
-        table=table_name,
-        # Optionally, you can specify additional parameters like database or schema if needed
+        query=f"SELECT * FROM {table_name}",
+        timestamp_field="event_timestamp",
     )
 
     # Define a feature view for offline store and online store
@@ -84,4 +74,4 @@ if __name__ == "__main__":
         )
 
     # Call the function with the required parameters
-    setup_feature_store(user, password, table_name="perform_large", num_features=500)
+    setup_feature_store(table_name="perform_large", num_features=500)
