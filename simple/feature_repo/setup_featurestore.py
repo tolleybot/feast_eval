@@ -10,7 +10,7 @@ from feast.types import Float32
 def setup_feature_store(
     table_name: str = "feature_data",
     num_features: int = 20000,
-    ttl: timedelta = None,
+    ttl: timedelta = timedelta(days=3),
     repo_path: str = ".",
 ):
     """
