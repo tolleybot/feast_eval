@@ -24,7 +24,7 @@ helm install my-postgresql bitnami/postgresql
 ### 4. **Retrieve PostgreSQL Password**:
 Fetch the auto-generated password for PostgreSQL:
 ```bash
-export POSTGRES_PASSWORD=$(kubectl get secret --namespace default my-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode)
+export POSTGRES_PASSWORD=$(kubectl get secret --namespace default my-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)
 ```
 
 ### 5. **Set Kubernetes Secrets for PostgreSQL Credentials**:
@@ -96,7 +96,11 @@ helm repo update
 helm install feast-release feast-charts/feast-feature-server \
     --set feature_store_yaml_base64=$(base64 < feature_store.yaml)
 ```
-
+**c.** Make updates to Feast using Helm if you have any changes
+```bash
+helm upgrade feast-release feast-charts/feast-feature-server \
+    --set feature_store_yaml_base64=$(base64 < feature_store.yaml)
+```
 ### 9. **Post-Installation Steps**:
 After installing Feast, you'd typically define and register features, entities, and other configurations using the Feast CLI or SDK. This involves creating Python scripts to define features, applying them with `feast apply`, and then materializing data into the online store.
 

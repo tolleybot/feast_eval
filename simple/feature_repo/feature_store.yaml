@@ -3,25 +3,25 @@ provider: local
 registry:
     registry_store_type: PostgreSQLRegistryStore
     path: feast_registry
-    host: my-postgresql.default.svc.cluster.local
+    host: localhost
     port: 5432
-    database: my_feast_db
+    database: performance
     db_schema: public
     user: ${PG_USERNAME}
     password: ${PG_PASSWORD}
 online_store:
     type: postgres
-    host: my-postgresql.default.svc.cluster.local
+    host: localhost
     port: 5432
-    database: my_feast_db
+    database: performance
     db_schema: public
     user: ${PG_USERNAME}
     password: ${PG_PASSWORD}
 offline_store:
     type: postgres
-    host: my-postgresql.default.svc.cluster.local
+    host: localhost
     port: 5432
-    database: my_feast_db
+    database: performance
     db_schema: public
     user: ${PG_USERNAME}
     password: ${PG_PASSWORD}

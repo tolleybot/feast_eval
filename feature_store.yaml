@@ -4,14 +4,16 @@ provider: local
 
 online_store:
   type: postgres
-  connection_string: jdbc:postgresql://my-postgresql.default.svc.cluster.local:5432/postgres
-  username: ${PG_USERNAME}
+  host: my-postgresql.default.svc.cluster.local
+  port: 5432
+  database: postgres
+  user: ${PG_USERNAME}
   password: ${PG_PASSWORD}
 
-# Assuming you also want to use PostgreSQL for the offline store:
 offline_store:
   type: postgres
-  connection_string: jdbc:postgresql://my-postgresql.default.svc.cluster.local:5432/postgres
-  username: ${PG_USERNAME}
+  host: my-postgresql.default.svc.cluster.local
+  port: 5432
+  database: postgres
+  user: ${PG_USERNAME}
   password: ${PG_PASSWORD}
-
