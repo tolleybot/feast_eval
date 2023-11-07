@@ -22,10 +22,10 @@ def create_table(cur, table_name, num_features):
     cur.execute(drop_table_sql)
 
     # Construct the SQL for table creation
-    columns = ", ".join([f"col{i} FLOAT" for i in range(num_features)])
+    columns = ", ".join([f"col_{i+1} REAL" for i in range(num_features)])
     create_table_sql = (
         f"CREATE TABLE {table_name} ("
-        f"id SERIAL PRIMARY KEY, event_timestamp TIMESTAMP, {columns})"
+        f"example_id SERIAL PRIMARY KEY, event_timestamp TIMESTAMP NOT NULL, {columns})"
     )
     cur.execute(create_table_sql)
 
@@ -36,7 +36,7 @@ def generate_data(db_params, table_name, num_rows, num_features):
     data = np.random.rand(num_rows, num_features)
 
     # Convert to a Pandas DataFrame
-    df = pd.DataFrame(data, columns=[f"col{i}" for i in range(num_features)])
+    df = pd.DataFrame(data, columns=[f"col_{i+1}" for i in range(num_features)])
     # Add a timestamp column with the current time for all rows
     df["event_timestamp"] = pd.Timestamp(datetime.now())
 
@@ -58,7 +58,7 @@ def generate_data(db_params, table_name, num_rows, num_features):
     buffer.seek(0)
 
     # Columns to insert, excluding 'id' which is auto-generated
-    columns = [f"col{i}" for i in range(num_features)] + ["event_timestamp"]
+    columns = [f"col_{i+1}" for i in range(num_features)] + ["event_timestamp"]
 
     # Insert the data into the database
     try:

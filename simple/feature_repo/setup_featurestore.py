@@ -33,7 +33,7 @@ def setup_feature_store(
         description="Example entity for feature view",
     )
 
-    schema = [Field(name=f"col{i}", dtype=Float32) for i in range(num_features)]
+    schema = [Field(name=f"col_{i+1}", dtype=Float32) for i in range(num_features)]
 
     # Define data source
     feature_data_source = PostgreSQLSource(
