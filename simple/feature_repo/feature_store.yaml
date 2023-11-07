@@ -2,6 +2,7 @@ project: simple
 provider: local
 registry:
     registry_store_type: PostgreSQLRegistryStore
+    path: registry # This will become the table name for the registry
     host: localhost
     port: 5432
     database: performance
