@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from io import StringIO
 import os
+from datetime import datetime
 
 # Retrieve database credentials from environment variables
 user = os.getenv("PG_USERNAME")
@@ -16,10 +17,15 @@ if not user or not password:
 
 
 def create_table(cur, table_name, num_features):
+    # Drop the table if it exists
+    drop_table_sql = f"DROP TABLE IF EXISTS {table_name}"
+    cur.execute(drop_table_sql)
+
     # Construct the SQL for table creation
     columns = ", ".join([f"col{i} FLOAT" for i in range(num_features)])
     create_table_sql = (
-        f"CREATE TABLE IF NOT EXISTS {table_name} (id SERIAL PRIMARY KEY, {columns})"
+        f"CREATE TABLE {table_name} ("
+        f"id SERIAL PRIMARY KEY, event_timestamp TIMESTAMP, {columns})"
     )
     cur.execute(create_table_sql)
 
@@ -31,6 +37,8 @@ def generate_data(db_params, table_name, num_rows, num_features):
 
     # Convert to a Pandas DataFrame
     df = pd.DataFrame(data, columns=[f"col{i}" for i in range(num_features)])
+    # Add a timestamp column with the current time for all rows
+    df["event_timestamp"] = pd.Timestamp(datetime.now())
 
     # Calculate the size of the data in megabytes
     data_size_bytes = df.memory_usage(index=True).sum()
@@ -49,11 +57,12 @@ def generate_data(db_params, table_name, num_rows, num_features):
     df.to_csv(buffer, header=False, index=False)
     buffer.seek(0)
 
+    # Columns to insert, excluding 'id' which is auto-generated
+    columns = [f"col{i}" for i in range(num_features)] + ["event_timestamp"]
+
     # Insert the data into the database
     try:
-        cur.copy_from(
-            buffer, table_name, sep=",", null="\\N", columns=df.columns.tolist()
-        )
+        cur.copy_from(buffer, table_name, sep=",", columns=columns)
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
         print("Error: %s" % error)
