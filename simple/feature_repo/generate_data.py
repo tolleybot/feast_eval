@@ -2,6 +2,26 @@ import psycopg2
 import numpy as np
 import pandas as pd
 from io import StringIO
+import os
+
+# Retrieve database credentials from environment variables
+user = os.getenv("PG_USERNAME")
+password = os.getenv("PG_PASSWORD")
+if not user or not password:
+    raise EnvironmentError(
+        "Please set the PG_USERNAME and PG_PASSWORD environment variables."
+    )
+# Remember to port foward the PostgreSQL port to your local machine
+# Example: kubectl port-forward svc/postgresql 5432:5432
+
+
+def create_table(cur, table_name, num_features):
+    # Construct the SQL for table creation
+    columns = ", ".join([f"col{i} FLOAT" for i in range(num_features)])
+    create_table_sql = (
+        f"CREATE TABLE IF NOT EXISTS {table_name} (id SERIAL PRIMARY KEY, {columns})"
+    )
+    cur.execute(create_table_sql)
 
 
 # Define the function to generate and insert data into PostgreSQL
@@ -19,6 +39,10 @@ def generate_data(db_params, table_name, num_rows, num_features):
     # Connect to the PostgreSQL database
     conn = psycopg2.connect(**db_params)
     cur = conn.cursor()
+
+    # Create table if it doesn't exist
+    create_table(cur, table_name, num_features)
+    conn.commit()
 
     # Create a buffer for the data
     buffer = StringIO()
@@ -46,17 +70,24 @@ def generate_data(db_params, table_name, num_rows, num_features):
     return data_size_mb, df
 
 
-# Example usage:
-db_params = {
-    "dbname": "your_db_name",
-    "user": "your_username",
-    "password": "your_password",
-    "host": "localhost",
-    "port": 5432,
-}
-table_name = "your_table_name"
-num_rows = 4096
-num_features = 20000
+if __name__ == "__main__":
+    # Example usage:
+    db_params = {
+        "dbname": "performance",
+        "user": user,
+        "password": password,
+        "host": "localhost",
+        "port": 5432,
+    }
+    table_name = "perform_large"
+    num_rows = 4096 * 10
+    # num_features = 20000 # I Hit the max row size limit of 8KB
+    num_features = 500
 
-# Generate and insert data
-data_size_mb, entity_df = generate_data(db_params, table_name, num_rows, num_features)
+    # Generate and insert data
+    data_size_mb, entity_df = generate_data(
+        db_params, table_name, num_rows, num_features
+    )
+
+    print(f"Data size: {data_size_mb} MB")
+    entity_df.head()
