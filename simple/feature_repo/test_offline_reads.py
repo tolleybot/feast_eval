@@ -6,11 +6,15 @@ import psycopg2
 import time
 import sys
 
-# Set the number of features to retrieve
+# import locust.stats
+
+# locust.stats.CSV_STATS_INTERVAL_SEC = 10  # default is 1 second
+# # Determines how often the data is flushed to disk, default is 10 seconds
+# locust.stats.CSV_STATS_FLUSH_INTERVAL_SEC = 60
 
 
 class FeastUser(User):
-    wait_time = between(1, 5)  # Task execution wait time between 1 to 5 seconds
+    wait_time = between(1, 1)  # Task execution wait time between 1 to 5 seconds
 
     def on_start(self):
         # Initialize the Feast FeatureStore
