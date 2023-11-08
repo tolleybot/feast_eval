@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Performance Metrics for Historical Features</title>
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  table, th, td {
+    border: 1px solid black;
+  }
+  th, td {
+    padding: 8px;
+    text-align: left;
+  }
+  th {
+    background-color: #f2f2f2;
+  }
+</style>
+</head>
+<body>
+
+<h2>Feast: Performance Metrics for Historical Features</h2>
+
+<!-- Table for 1 User and 1 Pod -->
+<h3>1 User and 1 Pod</h3>
+<table>
+  <tr>
+    <th>Type</th>
+    <th>Name</th>
+    <th>Median Response Time</th>
+    <th>Average Response Time</th>
+    <th>Min Response Time</th>
+    <th>Max Response Time</th>
+    <th>Data Size (bytes)</th>
+    <th>Rows</th>
+    <th>Columns</th>
+  </tr>
+  <tr>
+    <td>Feast</td>
+    <td>get_historical_features</td>
+    <td>23</td>
+    <td>22.86</td>
+    <td>22.25</td>
+    <td>23.49</td>
+    <td>32,833,700</td>
+    <td>4096</td>
+    <td>1002</td>
+  </tr>
+</table>
+
+<!-- Table for 10 Users and 1 Pod -->
+<h3>10 Users and 1 Pod</h3>
+<table>
+  <tr>
+    <th>Type</th>
+    <th>Name</th>
+    <th>Median Response Time</th>
+    <th>Average Response Time</th>
+    <th>Min Response Time</th>
+    <th>Max Response Time</th>
+    <th>Data Size (bytes)</th>
+    <th>Rows</th>
+    <th>Columns</th>
+  </tr>
+  <tr>
+    <td>Feast</td>
+    <td>get_historical_features</td>
+    <td>71</td>
+    <td>85.18</td>
+    <td>22.35</td>
+    <td>226.36</td>
+    <td>32,833,700</td>
+    <td>4096</td>
+    <td>1002</td>
+  </tr>
+</table>
+
+<!-- Table for 10 Users and 5 Pods -->
+<h3>10 Users and 5 Pods</h3>
+<table>
+  <tr>
+    <th>Type</th>
+    <th>Name</th>
+    <th>Median Response Time</th>
+    <th>Average Response Time</th>
+    <th>Min Response Time</th>
+    <th>Max Response Time</th>
+    <th>Data Size (bytes)</th>
+    <th>Rows</th>
+    <th>Columns</th>
+  </tr>
+  <tr>
+    <td>Feast</td>
+    <td>get_historical_features</td>
+    <td>71</td>
+    <td>76.46</td>
+    <td>22.00</td>
+    <td>201.83</td>
+    <td>32,833,700</td>
+    <td>4096</td>
+    <td>1002</td>
+  </tr>
+</table>
+
+</body>
+</html>
