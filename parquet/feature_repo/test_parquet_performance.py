@@ -206,23 +206,6 @@ def write_results_to_csv_file(results, outfilename):
             testwriter.writerow(row)
 
 
-# TODO: In progress, DOES NOT WORK.
-def write_results_to_google_sheet(results):
-    creds, _ = google.auth.default()
-
-    try:
-        service = build("sheets", "v4", credentials=creds)
-        spreadsheet = {"properties": {"title": "test-title"}}
-        spreadsheet = (
-            service.spreadsheets()
-            .create(body=spreadsheet, fields="spreadsheetId")
-            .execute()
-        )
-
-    except HttpError as error:
-        print(f"Error creating spreadsheet: {error}")
-
-
 def run_tests(
     parquet_outfile="outfile.parquet", csv_outfile="parquet_test_results.csv"
 ):
