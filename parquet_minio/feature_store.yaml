@@ -1,0 +1,8 @@
+project: parquet_minio
+registry: s3://my-bucket/registry.db
+provider: local
+offline_store:
+  type: file
+online_store:
+  type: sqlite
+  path: data/online_store.db

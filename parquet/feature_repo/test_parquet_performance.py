@@ -18,9 +18,9 @@ import pandas as pd
 import pyarrow.parquet as pq
 import pyarrow as pa
 
-import google.auth
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
+# import google.auth
+# from googleapiclient.discovery import build
+# from googleapiclient.errors import HttpError
 
 
 def nanoseconds_to_milliseconds(time_ns):
@@ -222,18 +222,18 @@ def run_tests(
         (10, 100),
         (10, 1000),
         (10, 10000),
-        # (100, 10),
-        # (100, 100),
-        # (100, 1000),
-        # (100, 10000),
-        # (1000, 10),
-        # (1000, 100),
-        # (1000, 1000),
-        # (1000, 10000),
-        # (10000, 10),
-        # (10000, 100),
-        # (10000, 1000),
-        # (10000, 10000),
+        (100, 10),
+        (100, 100),
+        (100, 1000),
+        (100, 10000),
+        (1000, 10),
+        (1000, 100),
+        (1000, 1000),
+        (1000, 10000),
+        (10000, 10),
+        (10000, 100),
+        (10000, 1000),
+        (10000, 10000),
     ]
 
     print("Running tests....")

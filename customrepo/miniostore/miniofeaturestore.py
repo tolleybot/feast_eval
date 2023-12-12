@@ -5,100 +5,23 @@ from feast.infra.offline_stores.offline_store import (
     OfflineStore,
     RetrievalJob,
 )
+from feast.infra.registry.registry import Registry
 from feast.feature_view import FeatureView
-from typing import List, Union
-import logging
 from feast.repo_config import RepoConfig
 
+from typing import List, Union
+import logging
 from pydantic import BaseModel
+import os
+
+s3_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
+s3_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
 
 class MinioOfflineStoreConfig(BaseModel):
     type: str = "miniostore.miniofeaturestore.MinioOfflineStore"
     minio_endpoint: str
-    minio_access_key: str
-    minio_secret_key: str
     bucket_name: str
-
-
-class MinioOfflineStore(OfflineStore):
-    def __init__(self, repo_config: RepoConfig):
-        super().__init__()
-        # The configurations will be loaded from feature_store.yaml by Feast
-        self.repo_config = repo_config
-        self.bucket_name = self.repo_config.offline_store.bucket_name
-
-    def get_historical_features(
-        self,
-        feature_views: List[FeatureView],
-        feature_refs: List[str],
-        entity_df: Union[pd.DataFrame, str],
-    ) -> RetrievalJob:
-        """
-        Retrieves historical features from the offline store based on the provided feature views,
-        feature references, and entity dataframe.
-
-        Parameters:
-        feature_views (List[FeatureView]): A list of FeatureView objects. Each FeatureView provides
-        necessary information about the features such as their source, transformation logic, and
-        associated entities. These are used to identify the specific features to retrieve and join
-        with the entity dataframe.
-
-        feature_refs (List[str]): A list of feature references in the format "feature_view:feature".
-        This list specifies the exact features to be retrieved. Each feature reference is a string
-        that uniquely identifies a feature in the format of "feature_view_name:feature_name".
-        Only features included in this list will be retrieved from the offline store.
-
-        entity_df (Union[pd.DataFrame, str]): The entity dataframe or a query that produces it.
-        This dataframe contains the entities and timestamps needed for retrieving historical features.
-        It should have columns corresponding to the entity keys defined in the feature views and,
-        optionally, a timestamp column to filter the feature data based on specific time ranges.
-
-        Returns:
-        RetrievalJob: An object that represents the result of the historical feature retrieval.
-        This object can be used to materialize the final dataframe containing the joined entity
-        and feature data.
-
-        Raises:
-        Exception: If any errors occur during the retrieval process, such as issues with connecting
-        to the offline store, reading data, or performing the join operation.
-
-        Notes:
-        - The implementation of this method will vary depending on the specific offline store being used.
-        - The method is expected to handle the joining of feature data with the entity dataframe
-        based on the entities and timestamps.
-        """
-        try:
-            # Setup MinIO connection using configurations from feature_store.yaml
-            s3 = s3fs.S3FileSystem(
-                client_kwargs={
-                    "endpoint_url": self.repo_config.offline_store.minio_endpoint,
-                    "aws_access_key_id": self.repo_config.offline_store.minio_access_key,
-                    "aws_secret_access_key": self.repo_config.offline_store.minio_secret_key,
-                }
-            )
-
-            # Adjust implementation based on your Parquet file structure and feature views
-            bucket_name = feature_views[0].batch_source.path.split("/")[2]
-            file_path = "/".join(feature_views[0].batch_source.path.split("/")[3:])
-            full_path = f"{bucket_name}/{file_path}"
-
-            # Reading the Parquet file from MinIO
-            dataset = pq.ParquetDataset(full_path, filesystem=s3)
-            table = dataset.read()
-            feature_df = table.to_pandas()
-
-            # Assuming single entity for simplicity, adjust as needed beyond testing
-            join_key = feature_views[0].entities[0]
-
-            # Combine features with entity dataframe (assuming appropriate join keys)
-            result_df = pd.merge(entity_df, feature_df, on=join_key, how="left")
-
-            # Wrap result DataFrame in a custom RetrievalJob
-            return CustomRetrievalJob(result_df)
-        except Exception as e:
-            logging.error(f"Error in get_historical_features: {str(e)}")
-            raise
 
 
 class CustomRetrievalJob(RetrievalJob):
@@ -110,6 +33,86 @@ class CustomRetrievalJob(RetrievalJob):
 
     def to_arrow(self):
         return self.dataframe.to_arrow()
+
+
+class MinioOfflineStore(OfflineStore):
+    def __init__(self, repo_config: RepoConfig):
+        super().__init__()
+        # The configurations will be loaded from feature_store.yaml by Feast
+        self.repo_config = repo_config
+        self.bucket_name = self.repo_config.offline_store.bucket_name
+
+    @staticmethod
+    def get_historical_features(
+        config: RepoConfig,
+        feature_views: List[FeatureView],
+        feature_refs: List[str],
+        entity_df: Union[pd.DataFrame, str],
+        registry: Registry,
+        project: str,
+        full_feature_names: bool = False,
+    ) -> RetrievalJob:
+        """
+        Retrieves historical features from the offline store.
+        """
+        try:
+            s3 = s3fs.S3FileSystem(
+                client_kwargs={
+                    "endpoint_url": config.offline_store.minio_endpoint,
+                    "aws_access_key_id": s3_access_key,
+                    "aws_secret_access_key": s3_secret_key,
+                }
+            )
+
+            # Combine data from all feature views
+            combined_feature_df = pd.DataFrame()
+            for fv in feature_views:
+                # Construct the file path for the feature view data
+                bucket_name = fv.batch_source.path.split("/")[2]
+                file_path = "/".join(fv.batch_source.path.split("/")[3:])
+                full_path = f"{bucket_name}/{file_path}"
+
+                # Read the Parquet file
+                with s3.open(full_path, "rb") as f:
+                    feature_df = pq.read_table(f).to_pandas()
+
+                # Select only the required features from this feature view
+                selected_features = [
+                    ref.split(":")[1]
+                    for ref in feature_refs
+                    if ref.startswith(fv.name + ":")
+                ]
+                if full_feature_names:
+                    feature_df = feature_df[[fv.entities[0]] + selected_features]
+                    feature_df.columns = [
+                        fv.name + "__" + col if col in selected_features else col
+                        for col in feature_df.columns
+                    ]
+                else:
+                    feature_df = feature_df[[fv.entities[0]] + selected_features]
+
+                # Merge with combined feature dataframe
+                if combined_feature_df.empty:
+                    combined_feature_df = feature_df
+                else:
+                    combined_feature_df = combined_feature_df.merge(
+                        feature_df, on=fv.entities[0], how="outer"
+                    )
+
+            # Merge entity DataFrame with combined feature DataFrame
+            if isinstance(entity_df, pd.DataFrame):
+                result_df = entity_df.merge(
+                    combined_feature_df, on=feature_views[0].entities[0], how="left"
+                )
+            else:
+                # If entity_df is a string (SQL query), additional logic to handle the query is needed
+                raise NotImplementedError("SQL query handling is not implemented.")
+
+            return CustomRetrievalJob(result_df)
+
+        except Exception as e:
+            logging.error(f"Error in get_historical_features: {str(e)}")
+            raise
 
 
 # Remember to replace 'join_key' with the actual key used for joining.

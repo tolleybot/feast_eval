@@ -9,6 +9,10 @@ from feast import Entity, FeatureView, FileSource, Field, ValueType
 import s3fs
 from feast.repo_config import RepoConfig
 from feast.types import Int64
+import os
+
+s3_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
+s3_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
 
 def generate_feast_repository_definitions(num_columns, parquet_file_path):
@@ -81,8 +85,8 @@ def create_parquet_file(
     fs = s3fs.S3FileSystem(
         client_kwargs={
             "endpoint_url": repo_config.offline_store.minio_endpoint,
-            "aws_access_key_id": repo_config.offline_store.minio_access_key,
-            "aws_secret_access_key": repo_config.offline_store.minio_secret_key,
+            "aws_access_key_id": s3_access_key,
+            "aws_secret_access_key": s3_secret_key,
         }
     )
 

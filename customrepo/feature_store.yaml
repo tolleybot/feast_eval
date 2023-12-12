@@ -4,7 +4,6 @@ provider: local
 offline_store:
     type: miniostore.MinioOfflineStore
     minio_endpoint: http://127.0.0.1:9000
-    minio_access_key: accesskey
-    minio_secret_key: secretkey
-    bucket_name: my-bucket
+    bucket_name: my-bucket,
+    filesystem : s3,
 
