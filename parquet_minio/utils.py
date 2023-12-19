@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from datetime import timedelta
 from feast import Entity, FeatureView, FileSource, Field, ValueType
@@ -10,9 +10,11 @@ import s3fs
 from feast.repo_config import RepoConfig
 from feast.types import Int64
 import os
+import time
 
 s3_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
 s3_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
+minio_endpoint = os.environ.get("FEAST_S3_ENDPOINT_URL")
 
 
 def generate_feast_repository_definitions(num_columns, parquet_file_path):
@@ -31,6 +33,7 @@ def generate_feast_repository_definitions(num_columns, parquet_file_path):
     dummy_source = FileSource(
         path=parquet_file_path,
         event_timestamp_column="event_timestamp",  # Adjust if your Parquet file has a different timestamp column
+        s3_endpoint_override=minio_endpoint,
     )
 
     # Define the complete schema (including both entities and features)
@@ -73,18 +76,21 @@ def create_parquet_file(
     # Create a DataFrame with random data
     df = pd.DataFrame(
         np.random.randint(0, 100, size=(num_rows, num_columns)),
-        columns=[f"feature_{i}" for i in range(num_columns)],
+        columns=[f"feature_{i}" for i in range(1, num_columns + 1)],
     )
-    df["user_id"] = np.arange(1, num_rows + 1)  # Adding a user_id column for entity
-    df["event_timestamp"] = pd.to_datetime(datetime.now())  # Adding a timestamp column
+    df["id"] = np.arange(1, num_rows + 1)  # Adding a user_id column for entity
+    df["event_timestamp"] = [
+        datetime.now() - timedelta(minutes=i) for i in range(num_rows)
+    ]
 
     # Convert DataFrame to PyArrow Table
     table = pa.Table.from_pandas(df)
 
-    # Set up the connection to MinIO using s3fs
+    begin = time.perf_counter_ns()
+
     fs = s3fs.S3FileSystem(
         client_kwargs={
-            "endpoint_url": repo_config.offline_store.minio_endpoint,
+            "endpoint_url": minio_endpoint,
             "aws_access_key_id": s3_access_key,
             "aws_secret_access_key": s3_secret_key,
         }
@@ -93,3 +99,7 @@ def create_parquet_file(
     # Write Table to a Parquet file in MinIO
     with fs.open(f"{bucket_name}/{s3_filepath}", "wb") as f:
         pq.write_table(table, f)
+
+    end = time.perf_counter_ns()
+
+    return (end - begin) / 1_000_000

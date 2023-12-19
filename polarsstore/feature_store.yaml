@@ -1,0 +1,7 @@
+project: parquet_minio
+registry: s3://my-bucket/registry.db
+provider: local
+offline_store:
+  type: polarsofflinestore.PolarsOfflineStore
+  minio_endpoint: http://localhost:9000  # Replace with your MinIO endpoint
+  bucket_name: my-bucket  # Replace with your bucket name

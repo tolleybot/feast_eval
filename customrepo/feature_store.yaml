@@ -1,9 +1,0 @@
-project: my_feature_store
-registry: data/registry.db
-provider: local
-offline_store:
-    type: miniostore.MinioOfflineStore
-    minio_endpoint: http://127.0.0.1:9000
-    bucket_name: my-bucket,
-    filesystem : s3,
-

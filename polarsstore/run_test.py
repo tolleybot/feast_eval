@@ -4,23 +4,62 @@ from utils import (
     create_parquet_file,
 )
 import time
-import pandas as pd
+from datetime import datetime, timedelta
+import csv
+import polars as pl
+
+
+def write_results_to_csv_file(results, outfilename):
+    """Writes the results of tests to a csv file.
+
+    :param results: The results of testing as a list of lists.
+    :param outfilename: The name of the file to write results.
+    """
+    with open(outfilename, "w", newline="\n") as csvfile:
+        testwriter = csv.writer(csvfile, delimiter=",")
+        for row in results:
+            testwriter.writerow(row)
 
 
 def run_tests():
     # Test configurations
-    test_cases = [(10, 100), (20, 200)]  # Define your test cases here
+    test_cases = [
+        (10, 10),
+        (10, 100),
+        (10, 1000),
+        (10, 10000),
+        (100, 10),
+        (100, 100),
+        (100, 1000),
+        (100, 10000),
+        (1000, 10),
+        (1000, 100),
+        (1000, 1000),
+        (1000, 10000),
+        (10000, 10),
+        (10000, 100),
+        (10000, 1000),
+        (10000, 10000),
+    ]
+
+    print("Running tests....")
+    results = []
+    results.append(
+        ["Number of columns", "Number of rows", "get_historical_feature read in ms"]
+    )
 
     for num_columns, num_rows in test_cases:
         # Initialize Feature Store
-        fs = FeatureStore()
+        fs = FeatureStore(".")
 
         # Define the path for the Parquet file in MinIO
         bucket_name = "my-bucket"
         s3_filepath = f"test_data_{num_columns}_{num_rows}.parquet"
 
         # Create and upload the Parquet file to MinIO
-        create_parquet_file(num_columns, num_rows, bucket_name, fs.config, s3_filepath)
+        write_time = create_parquet_file(
+            num_columns, num_rows, bucket_name, fs.config, s3_filepath
+        )
 
         # Generate Feast repository definitions
         parquet_file_path = f"s3://{bucket_name}/{s3_filepath}"
@@ -30,10 +69,12 @@ def run_tests():
         fs.apply(defs)  # Uncomment this if you need to apply the definitions
 
         # Create an entity DataFrame for historical feature retrieval
-        entity_df = pd.DataFrame(
+        entity_df = pl.DataFrame(
             {
-                "id": list(range(num_rows)),
-                "event_timestamp": [pd.Timestamp.now() for _ in range(num_rows)],
+                "id": list(range(1, num_rows + 1)),
+                "event_timestamp": [
+                    datetime.now() - timedelta(days=i) for i in range(num_rows)
+                ],
             }
         )
 
@@ -53,6 +94,11 @@ def run_tests():
         print(
             f"Test with {num_columns} columns and {num_rows} rows took {elapsed_time_ms} ms"
         )
+
+        results.append([num_columns, num_rows, elapsed_time_ms])
+
+    # write results to csv file
+    write_results_to_csv_file(results, "results.csv")
 
 
 if __name__ == "__main__":

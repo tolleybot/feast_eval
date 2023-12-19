@@ -1,0 +1,8 @@
+project: my_feast_project
+registry: http://127.0.0.1:9000//my-bucket/registry.db
+provider: aws
+offline_store:
+  type: file
+  file_options:
+    file_format: parquet
+    file_url: http://127.0.0.1:9000/my-bucket/data
